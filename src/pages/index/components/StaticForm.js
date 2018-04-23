@@ -27,7 +27,7 @@ function StaticForm({ dispatch, tournament, proposition, opposition, title, form
             },
             sm: {
                 span: 16,
-                offset: 8,
+                offset: 2,
             },
         },
     };
@@ -64,7 +64,7 @@ function StaticForm({ dispatch, tournament, proposition, opposition, title, form
                 {getFieldDecorator('name', {
                     initialValue: tournament.name,
                     rules: [{
-                        required: true, message: 'Please input your E-mail!',
+                        required: true, message: '请输入比赛名字！',
                     }],
                 })(
                     <Input placeholder="例：媒体杯" />
@@ -77,7 +77,7 @@ function StaticForm({ dispatch, tournament, proposition, opposition, title, form
                 {getFieldDecorator('subtitle', {
                     initialValue: tournament.subtitle,
                     rules: [{
-                        required: true, message: 'Please input your E-mail!',
+                        required: true, message: '请输入比赛阶段!',
                     }],
                 })(
                     <Input placeholder="例：决赛" />
@@ -90,7 +90,7 @@ function StaticForm({ dispatch, tournament, proposition, opposition, title, form
                 {getFieldDecorator('title', {
                     initialValue: title,
                     rules: [{
-                        required: true, message: 'Please input your E-mail!',
+                        required: true, message: '请输入比赛题目!',
                     }],
                 })(
                     <Input placeholder="例：英雄造时势/时势造英雄" />
@@ -103,7 +103,7 @@ function StaticForm({ dispatch, tournament, proposition, opposition, title, form
                 {getFieldDecorator('proposition', {
                     initialValue: proposition,
                     rules: [{
-                        required: true, message: 'Please input your E-mail!',
+                        required: true, message: '请输入正方名字!',
                     }],
                 })(
                     <Input />
@@ -116,7 +116,7 @@ function StaticForm({ dispatch, tournament, proposition, opposition, title, form
                 {getFieldDecorator('opposition', {
                     initialValue: opposition,
                     rules: [{
-                        required: true, message: 'Please input your E-mail!',
+                        required: true, message: '请输入反方名字!',
                     }],
                 })(
                     <Input />

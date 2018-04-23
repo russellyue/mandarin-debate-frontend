@@ -3,10 +3,10 @@ import styles from './Footer.less';
 
 
 function Footer({ children, location }) {
-    const russellFbLink = "https://www.facebook.com/profile.php?id=100009563812929";
+    const russellLink = "https://russellyue.github.io";
     return (
         <div className={styles.footer}>
-            Copyright © 2018 <a href={russellFbLink} target="_blank">Russell.Yue</a> All rights reserved
+            Copyright © 2018 <a href={russellLink} target="_blank">Russell.Yue</a> All rights reserved
         </div>
     );
 }

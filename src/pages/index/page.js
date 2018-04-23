@@ -2,13 +2,15 @@ import React from 'react';
 import { connect } from 'dva';
 import { Row, Col, Button, Popconfirm, message, Modal, List } from 'antd';
 import moment from 'moment';
+import Mousetrap from 'mousetrap';
 import styles from './index.less';
 
 import StaticComponent from './components/StaticComponent';
+import QiXiForm from './components/QiXiForm';
 
 import { contestSequence, sectionTypeMap } from '../../constants';
 
-function IndexPage({ dispatch, tournament, proposition, opposition, title, timer, sectionNumber, isStart, timerId, isSectionStart, isSectionEnd, isZiYouBian, isShowGoToModal, buttonDisabled, section, ziYouBianSide, showComponent }) {
+function IndexPage({ dispatch, tournament, proposition, opposition, title, timer, sectionNumber, isStart, timerId, isSectionStart, isZiYouBian, isShowGoToModal, buttonDisabled, section, ziYouBianSide, showComponent, qiXi }) {
 
   // const sectionContent = contestSequence[sectionNumber];
   const propsToStaticComponent = { dispatch, tournament, proposition, opposition, title, showComponent };
@@ -20,6 +22,12 @@ function IndexPage({ dispatch, tournament, proposition, opposition, title, timer
     });
     const text = `${tournament.name} ${tournament.subtitle} 正式开始`;
     message.success(text);
+    Mousetrap.bind('a', function (e) {
+      startZiYouBian(true);
+    });
+    Mousetrap.bind('s', function (e) {
+      startZiYouBian(false);
+    });
   }
 
   function startSection() {
@@ -62,9 +70,21 @@ function IndexPage({ dispatch, tournament, proposition, opposition, title, timer
     });
   }
 
+  function showQiXiModal() {
+    dispatch({
+      type: 'contest/showQiXiModal',
+    });
+  }
+
   function hideGoToModal() {
     dispatch({
       type: 'contest/hideGoToModal',
+    });
+  }
+
+  function hideQiXiModal() {
+    dispatch({
+      type: 'contest/hideQiXiModal',
     });
   }
 
@@ -104,52 +124,22 @@ function IndexPage({ dispatch, tournament, proposition, opposition, title, timer
 
   const buttonColConfig = {
     xs: {
-      span: 8
+      span: 6
     },
     sm: {
-      span: 8
-    }
-  }
-
-  const timerColConfig = {
-    xs: {
-      span: 8
-    },
-    sm: {
-      span: 8
-    }
-  }
-
-  const sectionColConfig = {
-    xs: {
-      span: 8
-    },
-    sm: {
-      span: 8
+      span: 6
     }
   }
 
   const sectionComponent = isStart ? (
-    <Row className={styles.section}>
-      <Col {...sectionColConfig} >
-        {section.isTwoSide ?
-          (<Button disabled={buttonDisabled.ziYouBianLeft} type="primary" shape="circle" icon="right" onClick={() => { startZiYouBian(true) }} />) : null
-        }
-      </Col>
-      <Col {...sectionColConfig} className={styles.section}>
-        <div className={styles.title}>
-          {section.title}
-        </div>
-        <div className={styles.subtitle}>
-          {section.subtitle}
-        </div>
-      </Col>
-      <Col {...sectionColConfig} >
-        {section.isTwoSide ?
-          (<Button disabled={buttonDisabled.ziYouBianRight} type="primary" shape="circle" icon="right" onClick={() => { startZiYouBian(false) }} />) : null
-        }
-      </Col>
-    </Row>
+    <div className={styles.section}>
+      <div className={styles.title}>
+        {`${section.number + 1}.${section.title}`}
+      </div>
+      <div className={styles.subtitle}>
+        {section.subtitle}
+      </div>
+    </div>
   ) : (
       <div className={styles.section}>
         <div className={styles.startButton}>
@@ -167,20 +157,9 @@ function IndexPage({ dispatch, tournament, proposition, opposition, title, timer
       <StaticComponent {...propsToStaticComponent} />
       {sectionComponent}
 
-      <Row className={styles.timer}>
-        <Col {...timerColConfig}>
-          <Button disabled={buttonDisabled.qixi} type="primary" shape="circle" >
-            奇袭
-          </Button>
-        </Col>
-        <Col {...timerColConfig}>
-          {moment.utc(timer * 1000).format("m:ss")}
-        </Col><Col {...timerColConfig}>
-          <Button disabled={buttonDisabled.qixi} type="primary" shape="circle" >
-            奇袭
-          </Button>
-        </Col>
-      </Row>
+      <div className={styles.timer}>
+        {moment.utc(timer * 1000).format("m:ss")}
+      </div>
 
       <Row className={styles.buttons}>
         <Col {...buttonColConfig}>
@@ -222,12 +201,35 @@ function IndexPage({ dispatch, tournament, proposition, opposition, title, timer
             />
           </Modal>
         </Col>
+        <Col {...buttonColConfig}>
+          <Button disabled={buttonDisabled.qiXi} type="primary" shape="circle" onClick={() => { showQiXiModal() }}>
+            奇袭
+          </Button>
+          <Modal
+            title="设置奇袭"
+            visible={showComponent.qiXiModal}
+            onOk={() => { hideQiXiModal() }}
+            width={300}
+            onCancel={() => { hideQiXiModal() }}
+          >
+            <QiXiForm dispatch={dispatch} />
+          </Modal>
+        </Col>
       </Row>
       {
         (section.type === sectionTypeMap["总结"] && section.number !== contestSequence.length - 1 && section.number !== contestSequence.length - 2) ?
           <div className={styles.zongJieButton}>
             <Button disabled={buttonDisabled.zongJieStop} type="primary" shape="circle" icon="minus" onClick={() => { stopZongJie() }} />
           </div> : null
+      }
+      {isZiYouBian ? (
+        <div className={styles.ziYouBianButton}>
+          {!buttonDisabled.ziYouBianLeft ?
+            <Button disabled={buttonDisabled.ziYouBianLeft} type="primary" shape="circle" icon="left" onClick={() => { startZiYouBian(true) }} /> :
+            <Button disabled={buttonDisabled.ziYouBianRight} type="primary" shape="circle" icon="right" onClick={() => { startZiYouBian(false) }} />}
+        </div>
+      )
+        : null
       }
     </div>
   );
@@ -237,7 +239,7 @@ IndexPage.propTypes = {
 };
 
 function mapStateToProps(state) {
-  const { tournament, proposition, opposition, title, timer, sectionNumber, isStart, timerId, isSectionStart, isSectionEnd, isZiYouBian, isShowGoToModal, buttonDisabled, section, ziYouBianSide, showComponent } = state.contest;
+  const { tournament, proposition, opposition, title, timer, sectionNumber, isStart, timerId, isSectionStart, isZiYouBian, isShowGoToModal, buttonDisabled, section, ziYouBianSide, showComponent, qiXi } = state.contest;
   return {
     tournament,
     proposition,
@@ -248,13 +250,13 @@ function mapStateToProps(state) {
     isStart,
     timerId,
     isSectionStart,
-    isSectionEnd,
     isZiYouBian,
     isShowGoToModal,
     buttonDisabled,
     section,
     ziYouBianSide,
     showComponent,
+    qiXi,
     loading: state.loading.models.contest,
   };
 }

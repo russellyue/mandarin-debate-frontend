@@ -1,6 +1,8 @@
 @import '../../constants.less';
 .index{
     & .section{
+        width: 380px;
+        margin: auto;
         & >.title{
             font-size: 50px;
         }
@@ -28,23 +30,14 @@
     }
     & .timer {
         font-size: 80px;
-        :global{
-            .ant-btn{
-                font-size: 20px;
-                height: 60px;
-                width: 60px;
-                background-color:@grey9;
-                color:@dark-font-color;
-            }
-        }
     }
     & .buttons{
         padding-top: 30px;
-        width: 300px;
+        width: 380px;
         margin: auto;
         :global{
             .ant-btn{
-                font-size: 30px;
+                font-size: 22px;
                 height: 60px;
                 width: 60px;
             }
@@ -59,6 +52,16 @@
                 width: 60px;
                 background: @grey9;
                 color: red;
+            }
+        }
+    }
+    & .ziYouBianButton{
+        padding-top: 20px;
+        :global{
+            .ant-btn{
+                font-size: 22px;
+                height: 60px;
+                width: 60px;
             }
         }
     }

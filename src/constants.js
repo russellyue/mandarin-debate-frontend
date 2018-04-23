@@ -1,23 +1,3 @@
-const propositionSequences = [
-    {
-        title: "正一立论",
-        subtitle: "",
-        duration: 240
-    },
-    {
-        title: "正一立论",
-        subtitle: "",
-        duration: 240
-    },
-];
-const oppositionSequences = [
-    {
-        title: "反方盘问",
-        subtitle: "四辩以外的反方任何一位辩手向正方一辩进行质询",
-        duration: 120
-    },
-];
-
 const sectionTypeMap = {
     "陈词": 0,
     "盘问": 1,
@@ -35,7 +15,7 @@ const contestSequence = [
         type: sectionTypeMap["陈词"],
     },
     {
-        title: "反方盘问",
+        title: "反方盘问正一",
         subtitle: "四辩以外的反方任何一位辩手向正方一辩进行质询",
         duration: 120,
         side: false,
@@ -51,7 +31,7 @@ const contestSequence = [
         type: sectionTypeMap["陈词"]
     },
     {
-        title: "正方盘问",
+        title: "正方盘问反一",
         subtitle: "四辩以外的正方任何一位辩手 向反方一辩进行质询",
         duration: 120,
         side: true,
@@ -67,7 +47,7 @@ const contestSequence = [
         type: sectionTypeMap["陈词"]
     },
     {
-        title: "反方盘问",
+        title: "反方盘问正二",
         subtitle: "四辩及已质询过对方之辩手以外的反方任何一位辩手向正方二辩进行质询",
         duration: 120,
         side: false,
@@ -83,7 +63,7 @@ const contestSequence = [
         type: sectionTypeMap["陈词"]
     },
     {
-        title: "正方盘问",
+        title: "正方盘问反二",
         subtitle: "四辩及已质询过对方之辩手以外的正方任何一位辩手向反方二辩进行质询",
         duration: 120,
         side: true,
@@ -99,7 +79,7 @@ const contestSequence = [
         type: sectionTypeMap["陈词"]
     },
     {
-        title: "反方盘问",
+        title: "反方盘问正三",
         subtitle: "四辩及已质询过对方之辩手以外的反方任何一位辩手向正方三辩进行质询",
         duration: 120,
         side: false,
@@ -115,7 +95,7 @@ const contestSequence = [
         type: sectionTypeMap["陈词"]
     },
     {
-        title: "正方盘问",
+        title: "正方盘问反三",
         subtitle: "四辩及已质询过对方之辩手以外的正方任何一位辩手向反方三辩进行质询",
         duration: 120,
         side: true,
@@ -164,15 +144,7 @@ const contestSequence = [
     }
 ];
 
-// const soundUrl = [
-//     "http://fjdx.sc.chinaz.com/files/download/sound1/201202/893.wav",
-//     "http://fjdx.sc.chinaz.com/files/download/sound1/201211/2276.wav",
-
-// ]
-
 export {
-    propositionSequences,
-    oppositionSequences,
     contestSequence,
     sectionTypeMap
 }

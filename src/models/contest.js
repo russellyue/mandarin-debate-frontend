@@ -1,6 +1,7 @@
 import cookie from 'react-cookies';
 import { contestSequence, sectionTypeMap } from '../constants';
-// import notify from '../utils/notify';
+import { Modal } from 'antd';
+import notify from '../utils/notify';
 export default {
     namespace: 'contest',
     state: {
@@ -17,8 +18,23 @@ export default {
             title: null,
             subtitle: null
         },
+        qiXiBeforeGoToNextSection: true,
+        isQiXiAvaiable: true,
+        qiXi: [
+            {
+                title: "陈词",
+                availability: true,
+                duration: 120
+            },
+            {
+                title: "盘问",
+                availability: true,
+                duration: 120
+            }
+        ],
         isStart: false,
         isSectionStart: false,
+        isSectionEnd: false,
         timerId: null,
         isZiYouBian: false,
         ziYouBianRemainTime: {
@@ -32,10 +48,11 @@ export default {
         ziYouBianSide: null,
         showComponent: {
             goToModal: false,
-            editModal: false
+            editModal: false,
+            qiXiModal: false
         },
         buttonDisabled: {
-            qixi: true,
+            qiXi: true,
             nextSection: true,
             startSection: true,
             goToSection: true,
@@ -43,7 +60,7 @@ export default {
             ziYouBianLeft: false,
             ziYouBianRight: true,
             zongJieStop: true
-        }
+        },
     },
     reducers: {
         saveStartGame(state, { payload: { isStart, section, timer, buttonDisabled } }) {
@@ -58,20 +75,17 @@ export default {
         saveZiYouBian(state, { payload: { isZiYouBian, ziYouBianRemainTime, section, isSectionStart, timer, ziYouBianSide } }) {
             return { ...state, isZiYouBian, ziYouBianRemainTime, section, isSectionStart, timer, ziYouBianSide };
         },
-        saveSectionEnd(state, { payload: { buttonDisabled, isSectionStart } }) {
-            return { ...state, buttonDisabled, isSectionStart }
+        saveSectionEnd(state, { payload: { buttonDisabled, isSectionStart, isSectionEnd, timer } }) {
+            return { ...state, buttonDisabled, isSectionStart, isSectionEnd }
         },
-        saveNextSection(state, { payload: { section, isSectionStart, timer, buttonDisabled, isZiYouBian } }) {
-            return { ...state, section, isSectionStart, timer, buttonDisabled, isZiYouBian };
+        saveNextSection(state, { payload: { section, isSectionStart, timer, buttonDisabled, isZiYouBian, isSectionEnd } }) {
+            return { ...state, section, isSectionStart, timer, buttonDisabled, isZiYouBian, isSectionEnd };
         },
         saveTimer(state, { payload: { timer } }) {
             return { ...state, timer };
         },
         saveTimerId(state, { payload: { timerId } }) {
             return { ...state, timerId };
-        },
-        saveIsSectionStart(state, { payload: { isSectionStart } }) {
-            return { ...state, isSectionStart };
         },
         saveShowComponent(state, { payload: showComponent }) {
             return { ...state, showComponent };
@@ -84,6 +98,9 @@ export default {
         },
         saveStaticContent(state, { payload: { tournament, proposition, opposition, title } }) {
             return { ...state, tournament, proposition, opposition, title }
+        },
+        saveStartQiXi(state, { payload: { section, qiXi, timer, buttonDisabled, qiXiBeforeGoToNextSection } }) {
+            return { ...state, section, qiXi, timer, buttonDisabled, qiXiBeforeGoToNextSection }
         }
     },
     effects: {
@@ -109,6 +126,7 @@ export default {
             const isSectionStart = true;
             const { buttonDisabled, section } = yield select(state => state.contest);
             buttonDisabled.goToSection = true;
+            buttonDisabled.qiXi = true;
             if (section.type === sectionTypeMap["总结"]) {
                 buttonDisabled.zongJieStop = false;
             }
@@ -125,8 +143,22 @@ export default {
 
         *timerMinus({ payload }, { put, select, call }) {
             let { timer, isZiYouBian, ziYouBianRemainTime, ziYouBianSide, section, buttonDisabled } = yield select(state => state.contest);
+            if (timer === 30) {
+                notify();
+                if (section.title === "正四 总结一" || section.title === "反四 总结一") {
+                    setTimeout(() => { notify() }, 1200)
+                }
+            }
+            if ((section.title === "正四 总结一" || section.title === "反四 总结一") && timer % 60 === 0 && timer !== 0 && timer !== 360) {
+                notify();
+            }
             if (timer === 0) {
-                // if it's ziyoubian section
+                notify();
+                setTimeout(() => { notify() }, 1200)
+                if (section.title === "正四 总结一" || section.title === "反四 总结一") {
+                    setTimeout(() => { notify() }, 2400)
+                }
+                // ziyoubian section
                 if (isZiYouBian) {
                     buttonDisabled.ziYouBianLeft = true;
                     buttonDisabled.ziYouBianRight = true;
@@ -160,6 +192,14 @@ export default {
                     yield put({ type: 'clearTimerId' });
                     yield put({ type: 'sectionEnd' });
                 }
+
+                if (section.number === 16) {
+                    Modal.success({
+                        title: '恭喜你完成比赛',
+                        content: '欢迎下次使用！',
+                    });
+                }
+
             } else {
                 yield put({ type: 'saveTimer', payload: { timer: timer - 1 } });
             }
@@ -167,13 +207,28 @@ export default {
         },
 
         *sectionEnd({ payload }, { select, put }) {
-            const { buttonDisabled } = yield select(state => state.contest);
+            let { buttonDisabled, section, timer, isSectionEnd, qiXiBeforeGoToNextSection } = yield select(state => state.contest);
             //  future work --- qixi => false when meet some condition 
+            if (section.number > 2 && section.number < 14) {
+                buttonDisabled.qiXi = false;
+            } else {
+                buttonDisabled.qiXi = true;
+            }
+
             buttonDisabled.startSection = true;
             buttonDisabled.nextSection = false;
             buttonDisabled.goToSection = false;
+
+            isSectionEnd = true;
             const isSectionStart = false;
-            yield put({ type: 'saveSectionEnd', payload: { buttonDisabled, isSectionStart } });
+            yield put({ type: 'saveSectionEnd', payload: { buttonDisabled, isSectionStart, isSectionEnd, timer } });
+            if (section.title === "反方奇袭" || section.title === "正方奇袭") {
+                if (qiXiBeforeGoToNextSection) {
+                    yield put({ type: 'goToSection', payload: section.number + 1 })
+                } else {
+                    yield put({ type: 'goToSection', payload: section.number })
+                }
+            }
         },
 
         *stopZongJie({ payload }, { select, put }) {
@@ -189,16 +244,24 @@ export default {
             let { section, buttonDisabled, zongJieRemainTime } = yield select(state => state.contest);
 
             const newSectionNumber = section.number + 1;
-            console.log(newSectionNumber);
 
+            const isSectionEnd = false;
             section = {
                 ...contestSequence[newSectionNumber],
                 number: newSectionNumber,
             };
 
+
             buttonDisabled.nextSection = true;
             buttonDisabled.startSection = false;
             buttonDisabled.startSection = section.isTwoSide ? true : false;
+
+            if (section.number > 3 && section.number < 14) {
+                buttonDisabled.qiXi = false;
+            } else {
+                buttonDisabled.qiXi = true;
+            }
+
             const isSectionStart = false;
             let timer = section.duration;
 
@@ -216,7 +279,8 @@ export default {
                     section,
                     isSectionStart,
                     timer,
-                    ziYouBianSide: true
+                    ziYouBianSide: true,
+                    isSectionEnd
                 }
                 yield put({ type: 'saveZiYouBian', payload: { ...paraPassToSaveZiYouBian } });
             } else {
@@ -226,6 +290,7 @@ export default {
                     timer,
                     buttonDisabled,
                     isZiYouBian: false,
+                    isSectionEnd
                 }
                 yield put({ type: 'saveNextSection', payload: { ...paraPassToSaveNextSection } });
             }
@@ -241,9 +306,18 @@ export default {
             };
             let timer = section.duration;
             const isSectionStart = false;
+            const isSectionEnd = false;
+
+            buttonDisabled.nextSection = true;
 
             if (section.type === sectionTypeMap["总结"]) {
                 timer = section.side ? zongJieRemainTime.proposition : zongJieRemainTime.opposition;
+            }
+
+            if (section.number > 3 && section.number < 14) {
+                buttonDisabled.qiXi = false;
+            } else {
+                buttonDisabled.qiXi = true;
             }
 
             buttonDisabled.startSection = section.isTwoSide ? true : false;
@@ -258,7 +332,8 @@ export default {
                     section,
                     isSectionStart,
                     timer,
-                    ziYouBianSide: true
+                    ziYouBianSide: true,
+                    isSectionEnd
                 }
                 yield put({ type: 'saveZiYouBian', payload: { ...paraPassToSaveZiYouBian } });
             } else {
@@ -268,6 +343,7 @@ export default {
                     timer,
                     buttonDisabled,
                     isZiYouBian: false,
+                    isSectionEnd
                 }
                 yield put({ type: 'saveNextSection', payload: { ...paraPassToSaveNextSection } });
             }
@@ -291,6 +367,7 @@ export default {
                 buttonDisabled.ziYouBianLeft = false;
                 buttonDisabled.ziYouBianRight = true;
             }
+            buttonDisabled.goToSection = true;
             section.subtitle = "剩余时间";
             isSectionStart = true;
             const parasPassToSaveStartZiYouBian = {
@@ -341,6 +418,33 @@ export default {
             yield put({ type: 'saveStaticContent', payload: { tournament, proposition, opposition, title } });
             yield put({ type: 'hideEditModal' });
         },
+
+        *startQiXi({ payload: { side, choice, } }, { put, select }) {
+            let { section, qiXi, buttonDisabled, timer } = yield select(state => state.contest);
+            buttonDisabled.startSection = true;
+            section.title = side ? "正方奇袭" : "反方奇袭";
+            section.subtitle = qiXi[choice].title;
+            let qiXiBeforeGoToNextSection = false;
+            if (timer === 0 || (section.number === 12 || section.number === 13 && timer < 360)) {
+                qiXiBeforeGoToNextSection = true;
+            }
+            timer = qiXi[choice].duration;
+            buttonDisabled.startSection = false;
+            yield put({ type: 'saveStartQiXi', payload: { section, qiXi, timer, buttonDisabled, qiXiBeforeGoToNextSection } });
+            yield put({ type: 'hideQiXiModal' });
+        },
+        *showQiXiModal({ payload }, { put, select }) {
+            let { showComponent } = yield select(state => state.contest);
+            showComponent.qiXiModal = true;
+            yield put({ type: 'saveShowComponent', payload: showComponent });
+        },
+        *hideQiXiModal({ payload }, { put, select }) {
+            let { showComponent } = yield select(state => state.contest);
+            showComponent.qiXiModal = false;
+            yield put({ type: 'saveShowComponent', payload: showComponent });
+        },
+
+        // future work
         // *newGame({ payload }, { put, select }) {
         //     let {isStart,section,isSectionStart} = yield select(state=>state.contest);
         //     yield put({ type: 'saveNewGame' });
@@ -351,7 +455,10 @@ export default {
             window.onbeforeunload = function () {
                 return "你确定要离开页面吗？";
             };
-            dispatch({ type: 'setStaticContent', payload: { ...cookie.load('staticContent') } });
+            const staticContent = cookie.load('staticContent');
+            if (staticContent !== undefined) {
+                dispatch({ type: 'setStaticContent', payload: { ...staticContent } });
+            }
         },
     },
 };

@@ -924,6 +924,10 @@ ajv@^6.1.0:
     json-schema-traverse "^0.3.0"
     uri-js "^3.0.2"
 
+alert@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/alert/-/alert-1.0.0.tgz#0d589fc17b4e6014f519e73311f5414c8738ee6a"
+
 align-text@^0.1.1, align-text@^0.1.3:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/align-text/-/align-text-0.1.4.tgz#0cd90a561093f35d0a99256c22b7069433fad117"
@@ -5893,6 +5897,10 @@ moment@2.x, moment@^2.19.3, moment@^2.22.0:
   version "2.22.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.0.tgz#7921ade01017dd45186e7fee5f424f0b8663a730"
 
+mousetrap@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/mousetrap/-/mousetrap-1.6.1.tgz#2a085f5c751294c75e7e81f6ec2545b29cbf42d9"
+
 move-concurrently@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/move-concurrently/-/move-concurrently-1.0.1.tgz#be2c005fda32e0b29af1f05d7c4b33214c701f92"
@@ -6549,6 +6557,10 @@ pkg-up@^2.0.0:
   resolved "https://registry.yarnpkg.com/pkg-up/-/pkg-up-2.0.0.tgz#c819ac728059a461cab1c3889a2be3c49a004d7f"
   dependencies:
     find-up "^2.1.0"
+
+play-audio@^0.0.1-security:
+  version "0.0.1-security"
+  resolved "https://registry.yarnpkg.com/play-audio/-/play-audio-0.0.1-security.tgz#529e1adffdc734f214e84b3d0d629144f2cd3a88"
 
 pluralize@^7.0.0:
   version "7.0.0"

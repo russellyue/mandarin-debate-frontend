@@ -7,8 +7,11 @@
     "precommit": "npm run lint"
   },
   "dependencies": {
+    "alert": "^1.0.0",
     "dva": "^2.1.0",
     "moment": "^2.22.0",
+    "mousetrap": "^1.6.1",
+    "play-audio": "^0.0.1-security",
     "react-cookies": "^0.1.0",
     "umi": "^1.0.0-0",
     "umi-plugin-dva": "^0.1.5"
