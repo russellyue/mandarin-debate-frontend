@@ -1,2 +1,0 @@
-# mandarin-debate-frontend
-
